@@ -260,15 +260,15 @@
         <div class="stats-grid">
             <div class="stat-item">
                 <span class="stat-label">Model Name</span>
-                <span class="stat-value" id="stat-model">NEURAL-INK v.2</span>
+                <span class="stat-value" id="stat-model">—</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Intensity</span>
-                <span class="stat-value">840 DPI</span>
+                <span class="stat-value" id="stat-intensity">—</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Estimated</span>
-                <span class="stat-value" id="stat-eta">00:04:12</span>
+                <span class="stat-value" id="stat-eta">—</span>
             </div>
         </div>
 
@@ -281,9 +281,9 @@
         const banner   = document.getElementById('inkwell-press-banner');
         const mainStatus = document.getElementById('main-status');
         const statusText = document.getElementById('status-text');
-        const modelVal = document.getElementById('stat-model');
-        const etaVal   = document.getElementById('stat-eta');
-        const intensityVal = document.querySelector('.stat-item:nth-child(2) .stat-value');
+        const modelVal     = document.getElementById('stat-model');
+        const etaVal       = document.getElementById('stat-eta');
+        const intensityVal = document.getElementById('stat-intensity');
 
         function completeTask(modelName) {
             banner.classList.remove('status-waiting');
