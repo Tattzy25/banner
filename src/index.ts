@@ -186,7 +186,8 @@ app.get("/mcp", (_req, res) => {
 });
 
 httpServer.listen(PORT, () => {
+  const domain = process.env.RAILWAY_PUBLIC_DOMAIN || `localhost:${PORT}`;
   console.error(`inkwell-press-mcp-server running`);
-  console.error(`  UI:  http://localhost:${PORT}/`);
-  console.error(`  MCP: http://localhost:${PORT}/mcp  (JSON-RPC 2.0)`);
+  console.error(`  UI:  https://${domain}/`);
+  console.error(`  MCP: https://${domain}/mcp (JSON-RPC 2.0)`);
 });
