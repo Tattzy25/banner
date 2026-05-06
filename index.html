@@ -148,26 +148,71 @@
             justify-content: center;
         }
 
-        .stat-item {
+        /* Orb Loader */
+        .orb-wrapper {
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 8px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
-        .stat-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
+        .orb-wrapper.hidden {
+            display: none;
         }
 
-        .stat-value {
-            font-family: 'Space Mono', monospace;
-            font-size: 14px;
-            color: var(--paper-white);
-            font-weight: 700;
+        .orb-scene {
+            --color-one: #ffbf48;
+            --color-two: #be4a1d;
+            --color-three: #e8533a;
+            --color-four: #ff8c42;
+            --anim-time: 2s;
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .orb-scene svg {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        .orb-scene .box {
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(
+                var(--color-one),
+                var(--color-two),
+                var(--color-three),
+                var(--color-four),
+                var(--color-one)
+            );
+            -webkit-mask: url(#clipping);
+            mask: url(#clipping);
+            animation:
+                rotation var(--anim-time) linear infinite,
+                roundness calc(var(--anim-time) * 2) ease-in-out infinite alternate,
+                colorize calc(var(--anim-time) * 3) ease-in-out infinite alternate;
+            border-radius: 30%;
+            filter: drop-shadow(0 0 18px rgba(255, 191, 72, 0.55));
+        }
+
+        @keyframes rotation {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        @keyframes roundness {
+            0%   { border-radius: 30%; }
+            50%  { border-radius: 50%; }
+            100% { border-radius: 30%; }
+        }
+
+        @keyframes colorize {
+            0%   { filter: drop-shadow(0 0 18px rgba(255, 191, 72, 0.55)) hue-rotate(0deg); }
+            50%  { filter: drop-shadow(0 0 24px rgba(190, 74, 29, 0.65)) hue-rotate(30deg); }
+            100% { filter: drop-shadow(0 0 18px rgba(255, 191, 72, 0.55)) hue-rotate(0deg); }
         }
 
         /* Notification Reveal */
@@ -258,17 +303,23 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-item">
-                <span class="stat-label">Model Name</span>
-                <span class="stat-value" id="stat-model">NEURAL-INK v.2</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Intensity</span>
-                <span class="stat-value">840 DPI</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Estimated</span>
-                <span class="stat-value" id="stat-eta">00:04:12</span>
+            <div class="orb-wrapper" id="orb-wrapper">
+                <div class="orb-scene">
+                    <svg xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <mask id="clipping">
+                                <polygon points="60,5 75,20 95,15 90,35 110,45 90,55 95,75 75,70 60,85 45,70 25,75 30,55 10,45 30,35 25,15 45,20" fill="white"/>
+                                <polygon points="60,15 72,27 88,23 84,39 100,47 84,55 88,71 72,67 60,79 48,67 32,71 36,55 20,47 36,39 32,23 48,27" fill="black" opacity="0.3"/>
+                                <polygon points="60,22 70,32 84,29 81,43 95,50 81,57 84,71 70,68 60,78 50,68 36,71 39,57 25,50 39,43 36,29 50,32" fill="white" opacity="0.6"/>
+                                <polygon points="60,30 68,38 80,35 77,47 89,53 77,59 80,71 68,68 60,76 52,68 40,71 43,59 31,53 43,47 40,35 52,38" fill="black" opacity="0.2"/>
+                                <polygon points="60,36 67,43 77,41 75,51 85,56 75,61 77,71 67,69 60,76 53,69 43,71 45,61 35,56 45,51 43,41 53,43" fill="white" opacity="0.5"/>
+                                <polygon points="60,42 66,48 74,46 72,55 81,59 72,63 74,72 66,70 60,76 54,70 46,72 48,63 39,59 48,55 46,46 54,48" fill="black" opacity="0.15"/>
+                                <polygon points="60,48 65,53 72,51 70,59 78,63 70,67 72,75 65,73 60,78 55,73 48,75 50,67 42,63 50,59 48,51 55,53" fill="white" opacity="0.4"/>
+                            </mask>
+                        </defs>
+                    </svg>
+                    <div class="box"></div>
+                </div>
             </div>
         </div>
 
@@ -278,14 +329,12 @@
     </div>
 
     <script>
-        const banner   = document.getElementById('inkwell-press-banner');
+        const banner     = document.getElementById('inkwell-press-banner');
         const mainStatus = document.getElementById('main-status');
         const statusText = document.getElementById('status-text');
-        const modelVal = document.getElementById('stat-model');
-        const etaVal   = document.getElementById('stat-eta');
-        const intensityVal = document.querySelector('.stat-item:nth-child(2) .stat-value');
+        const orbWrapper = document.getElementById('orb-wrapper');
 
-        function completeTask(modelName) {
+        function completeTask() {
             banner.classList.remove('status-waiting');
             banner.classList.add('status-ready');
             banner.style.transform = 'scale(1.02)';
@@ -293,19 +342,12 @@
             setTimeout(() => {
                 statusText.innerText = 'Sequence Complete';
                 mainStatus.innerHTML = 'Ink Permanence <br>Achieved.';
-                etaVal.innerText = '00:00:00';
-                if (modelName) modelVal.innerText = modelName;
+                orbWrapper.classList.add('hidden');
             }, 300);
         }
 
         function updateStatus(message) {
             mainStatus.innerText = message;
-        }
-
-        function updateStats({ model, intensity, eta }) {
-            if (model)     modelVal.innerText     = model;
-            if (intensity) intensityVal.innerText = intensity;
-            if (eta)       etaVal.innerText        = eta;
         }
 
         // ── WebSocket connection to the MCP server ──────────────────────────
@@ -317,9 +359,8 @@
             ws.onmessage = (event) => {
                 let msg;
                 try { msg = JSON.parse(event.data); } catch { return; }
-                if (msg.type === 'complete')  completeTask(msg.modelName);
-                if (msg.type === 'status')    updateStatus(msg.message);
-                if (msg.type === 'stats')     updateStats(msg);
+                if (msg.type === 'complete') completeTask();
+                if (msg.type === 'status')   updateStatus(msg.message);
             };
 
             ws.onclose = () => setTimeout(connect, 2000);
