@@ -206,9 +206,12 @@ app.get("/mcp", (_req, res) => {
     endpoint: "/mcp",
   });
 });
+<<<<<<< railway/code-change-ihz-__
 
 httpServer.listen(PORT, () => {
   console.error(`inkwell-press-mcp-server running`);
   console.error(`  UI:  http://localhost:${PORT}/`);
   console.error(`  MCP: http://localhost:${PORT}/mcp (JSON-RPC 2.0)`);
 });
+=======
+>>>>>>> main
