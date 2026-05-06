@@ -278,50 +278,54 @@
     </div>
 
     <script>
-        /**
-         * Global API hook for the component.
-         * Call window.completeInkwellTask() to trigger the transition.
-         */
-        window.completeInkwellTask = function(customData = {}) {
-            const banner = document.getElementById('inkwell-press-banner');
-            const statusText = document.getElementById('status-text');
-            const mainStatus = document.getElementById('main-status');
-            const modelVal = document.getElementById('stat-model');
-            const etaVal = document.getElementById('stat-eta');
+        const banner   = document.getElementById('inkwell-press-banner');
+        const mainStatus = document.getElementById('main-status');
+        const statusText = document.getElementById('status-text');
+        const modelVal = document.getElementById('stat-model');
+        const etaVal   = document.getElementById('stat-eta');
+        const intensityVal = document.querySelector('.stat-item:nth-child(2) .stat-value');
 
-            // Switch Classes
+        function completeTask(modelName) {
             banner.classList.remove('status-waiting');
             banner.classList.add('status-ready');
-
-            // Update Text content with a slight delay for feel
-            setTimeout(() => {
-                statusText.innerText = "Sequence Complete";
-                mainStatus.innerHTML = "Ink Permanence <br>Achieved.";
-                etaVal.innerText = "00:00:00";
-                
-                if (customData.modelName) {
-                    modelVal.innerText = customData.modelName;
-                }
-            }, 300);
-
-            // Add haptic-like animation shake
             banner.style.transform = 'scale(1.02)';
+            setTimeout(() => { banner.style.transform = 'scale(1)'; }, 200);
             setTimeout(() => {
-                banner.style.transform = 'scale(1)';
-            }, 200);
-        };
+                statusText.innerText = 'Sequence Complete';
+                mainStatus.innerHTML = 'Ink Permanence <br>Achieved.';
+                etaVal.innerText = '00:00:00';
+                if (modelName) modelVal.innerText = modelName;
+            }, 300);
+        }
 
-        /**
-         * Simulation for demonstration purposes.
-         * In production, remove this and call window.completeInkwellTask() via your API socket.
-         */
-        setTimeout(() => {
-            console.log("Simulating API call success...");
-            window.completeInkwellTask({
-                modelName: "ETCHED-FINAL-V1"
-            });
-        }, 5000);
+        function updateStatus(message) {
+            mainStatus.innerText = message;
+        }
 
+        function updateStats({ model, intensity, eta }) {
+            if (model)     modelVal.innerText     = model;
+            if (intensity) intensityVal.innerText = intensity;
+            if (eta)       etaVal.innerText        = eta;
+        }
+
+        // ── WebSocket connection to the MCP server ──────────────────────────
+        const WS_URL = `ws://${location.host}`;
+
+        function connect() {
+            const ws = new WebSocket(WS_URL);
+
+            ws.onmessage = (event) => {
+                let msg;
+                try { msg = JSON.parse(event.data); } catch { return; }
+                if (msg.type === 'complete')  completeTask(msg.modelName);
+                if (msg.type === 'status')    updateStatus(msg.message);
+                if (msg.type === 'stats')     updateStats(msg);
+            };
+
+            ws.onclose = () => setTimeout(connect, 2000);
+        }
+
+        connect();
     </script>
 </body>
 </html>

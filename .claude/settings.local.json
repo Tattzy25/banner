@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\brand\\\\Downloads\\\\ban\\\\src\")",
+      "Bash(Out-Null)",
+      "Bash(mkdir -p /c/Users/brand/Downloads/ban/src)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\brand\\Downloads\\ban"
+    ]
+  }
+}
