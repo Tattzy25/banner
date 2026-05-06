@@ -164,6 +164,28 @@ Returns: Confirmation string.`,
   }
 );
 
+// ─── POST /training-complete — receive training data and broadcast to banner ───
+app.post("/training-complete", (req, res) => {
+  const { modelName, model, intensity, eta } = req.body as {
+    modelName?: string;
+    model?: string;
+    intensity?: string;
+    eta?: string;
+  };
+
+  // Broadcast stats update if any stat fields were provided
+  const statsPayload: Record<string, string | undefined> = { model, intensity, eta };
+  const hasStats = Object.values(statsPayload).some((v) => v !== undefined);
+  if (hasStats) {
+    broadcast({ type: "stats", model, intensity, eta });
+  }
+
+  // Broadcast completion event
+  broadcast({ type: "complete", modelName: modelName ?? model ?? null });
+
+  res.json({ ok: true, clients: clients.size });
+});
+
 // ─── Streamable HTTP transport (JSON-RPC 2.0) ─────────────────────────────────
 app.post("/mcp", async (req, res) => {
   const transport = new StreamableHTTPServerTransport({
@@ -188,5 +210,5 @@ app.get("/mcp", (_req, res) => {
 httpServer.listen(PORT, () => {
   console.error(`inkwell-press-mcp-server running`);
   console.error(`  UI:  http://localhost:${PORT}/`);
-  console.error(`  MCP: http://localhost:${PORT}/mcp  (JSON-RPC 2.0)`);
+  console.error(`  MCP: http://localhost:${PORT}/mcp (JSON-RPC 2.0)`);
 });
