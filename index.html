@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #0D0D0E;
+            --ink-black: #050505;
+            --paper-white: #E8E8E8;
+            --signal-orange: #FF6B00;
+            --signal-green: #00FF85;
+            --grain-opacity: 0.07;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* The Inkwell Container */
+        .inkwell-banner {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            background: var(--obsidian);
+            border-radius: 32px;
+            padding: 40px;
+            color: var(--paper-white);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Grain Overlay */
+        .inkwell-banner::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background: url("https://www.transparenttextures.com/patterns/stardust.png");
+            opacity: var(--grain-opacity);
+            mix-blend-mode: overlay;
+            z-index: 2;
+        }
+
+        /* Branding Section */
+        .brand-section {
+            position: relative;
+            z-index: 3;
+        }
+
+        .brand-title {
+            font-weight: 900;
+            font-size: 10px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-title::before {
+            content: "";
+            width: 30px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-display {
+            font-size: 42px;
+            line-height: 1.1;
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+            color: var(--paper-white);
+        }
+
+        /* The Indicator */
+        .indicator-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-waiting .dot {
+            background: var(--signal-orange);
+            box-shadow: 0 0 15px var(--signal-orange);
+            animation: pulse-orange 1.5s infinite ease-in-out;
+        }
+
+        .status-ready .dot {
+            background: var(--signal-green);
+            box-shadow: 0 0 15px var(--signal-green);
+            animation: none;
+        }
+
+        .status-ready #status-text {
+            color: var(--signal-green);
+        }
+
+        @keyframes pulse-orange {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.5; }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            position: relative;
+            z-index: 3;
+            background: var(--ink-black);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+        }
+
+        .stat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            color: var(--paper-white);
+            font-weight: 700;
+        }
+
+        /* Notification Reveal */
+        .notification-tray {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: var(--signal-green);
+            color: black;
+            padding: 12px 40px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 12px;
+            text-align: center;
+            transition: bottom 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 4;
+        }
+
+        .status-ready .notification-tray {
+            bottom: 0;
+        }
+
+        /* Progress Bar (Visual Only) */
+        .progress-container {
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            margin-top: 30px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 65%;
+            background: var(--paper-white);
+            opacity: 0.4;
+            transition: width 1s ease, background 0.5s ease;
+        }
+
+        .status-ready .progress-bar {
+            width: 100%;
+            background: var(--signal-green);
+            opacity: 1;
+        }
+
+        /* Decorative Elements */
+        .ink-splat {
+            position: absolute;
+            right: -50px;
+            top: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .inkwell-banner {
+                grid-template-columns: 1fr;
+                margin: 20px;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="inkwell-press-banner" class="inkwell-banner status-waiting">
+        <div class="ink-splat"></div>
+        
+        <div class="brand-section">
+            <div class="brand-title">Obsidian Inkwell Press</div>
+            <div class="status-display" id="main-status">
+                Etching your <br>creative vision.
+            </div>
+            
+            <div class="indicator-group">
+                <div class="dot"></div>
+                <span id="status-text">Processing Engine Live</span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-indicator"></div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">Model Training</span>
+                <span class="stat-value" id="stat-model">NEURAL-INK v.2</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Intensity</span>
+                <span class="stat-value">840 DPI</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Estimated</span>
+                <span class="stat-value" id="stat-eta">00:04:12</span>
+            </div>
+        </div>
+
+        <div class="notification-tray" id="notif-bar">
+            SYSTEM NOTIFICATION: TRANSFER COMPLETE / READY FOR VIEWING
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Global API hook for the component.
+         * Call window.completeInkwellTask() to trigger the transition.
+         */
+        window.completeInkwellTask = function(customData = {}) {
+            const banner = document.getElementById('inkwell-press-banner');
+            const statusText = document.getElementById('status-text');
+            const mainStatus = document.getElementById('main-status');
+            const modelVal = document.getElementById('stat-model');
+            const etaVal = document.getElementById('stat-eta');
+
+            // Switch Classes
+            banner.classList.remove('status-waiting');
+            banner.classList.add('status-ready');
+
+            // Update Text content with a slight delay for feel
+            setTimeout(() => {
+                statusText.innerText = "Sequence Complete";
+                mainStatus.innerHTML = "Ink Permanence <br>Achieved.";
+                etaVal.innerText = "00:00:00";
+                
+                if (customData.modelName) {
+                    modelVal.innerText = customData.modelName;
+                }
+            }, 300);
+
+            // Add haptic-like animation shake
+            banner.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                banner.style.transform = 'scale(1)';
+            }, 200);
+        };
+
+        /**
+         * Simulation for demonstration purposes.
+         * In production, remove this and call window.completeInkwellTask() via your API socket.
+         */
+        setTimeout(() => {
+            console.log("Simulating API call success...");
+            window.completeInkwellTask({
+                modelName: "ETCHED-FINAL-V1"
+            });
+        }, 5000);
+
+    </script>
+</body>
+</html>
