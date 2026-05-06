@@ -185,8 +185,31 @@ app.get("/mcp", (_req, res) => {
   });
 });
 
+// ─── POST /training-complete — receive training workflow notifications ─────────
+app.post("/training-complete", (req, res) => {
+  try {
+    const { modelName, intensity, eta } = req.body || {};
+
+    if (!modelName && !intensity && !eta) {
+      return res.status(400).json({
+        error: "At least one field required: modelName, intensity, or eta",
+      });
+    }
+
+    broadcast({ type: "complete", modelName, intensity, eta });
+    console.error(
+      `[training-complete] broadcasted — modelName=${modelName ?? "—"} intensity=${intensity ?? "—"} eta=${eta ?? "—"}`
+    );
+    res.json({ success: true, message: "Training completion broadcasted to banner" });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ error: `Invalid request: ${error instanceof Error ? error.message : String(error)}` });
+  }
+});
+
 httpServer.listen(PORT, () => {
   console.error(`inkwell-press-mcp-server running`);
   console.error(`  UI:  http://localhost:${PORT}/`);
-  console.error(`  MCP: http://localhost:${PORT}/mcp  (JSON-RPC 2.0)`);
+  console.error(`  MCP: http://localhost:${PORT}/mcp (JSON-RPC 2.0)`);
 });
