@@ -184,9 +184,3 @@ app.get("/mcp", (_req, res) => {
     endpoint: "/mcp",
   });
 });
-
-httpServer.listen(PORT, () => {
-  console.error(`inkwell-press-mcp-server running`);
-  console.error(`  UI:  http://localhost:${PORT}/`);
-  console.error(`  MCP: http://localhost:${PORT}/mcp  (JSON-RPC 2.0)`);
-});
